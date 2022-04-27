@@ -1,0 +1,4 @@
+# This file lists the dependencies required by the PHP role
+
+dependencies:
+  - role: apache

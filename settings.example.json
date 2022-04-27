@@ -1,0 +1,8 @@
+{
+  "balchivist_directory_user": "user",
+  "balchivist_directory_group": "group",
+  "mariadb_client_host": "host.example.com",
+  "mariadb_client_user": "user",
+  "mariadb_client_password": "pass",
+  "legacycron_email_address": "test@example.com"
+}

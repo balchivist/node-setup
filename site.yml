@@ -1,0 +1,26 @@
+# Main playbook for Balchivist
+
+- name: Apply common configuration settings to all nodes
+  hosts: all
+  roles:
+    - common
+    - apache
+    - mariadb-client
+    - php
+
+- name: Configure and deploy Balchivist runners
+  hosts: runners
+  become: yes # become root
+  roles:
+    - balchivist
+
+- name: Configure web servers
+  hosts: webservers
+  become: yes # become root
+  roles:
+    - dumpsmirror
+
+- name: Configure cron for legacy Balchivist
+  hosts: runners[0]
+  roles:
+    - legacycron

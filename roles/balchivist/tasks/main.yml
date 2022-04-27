@@ -1,0 +1,28 @@
+# This playbook installs the necessary dependencies for Balchivist
+# It also configures the server's environment to allow Balchivist to run
+
+- name: Ensure that python pip is at the latest version
+  ansible.builtin.apt:
+    name: python3-pip
+    state: latest
+
+- name: Install the packages needed for Balchivist
+  ansible.builtin.pip:
+    name:
+      - internetarchive
+    state: latest
+
+# Reference: https://wikitech.wikimedia.org/wiki/Help:Adding_Disk_Space_to_Cloud_VPS_instances
+- name: Mount Cinder volume
+  ansible.builtin.command: wmcs-prepare-cinder-volume --force --device=sdb --mountpoint=/srv
+  register: command_result
+  failed_when: "'argument --device: invalid choice' in command_result.stderr"
+
+- name: Create temporary storage directory for Balchivist
+  ansible.builtin.file:
+    path: /srv/temp
+    state: directory
+    mode: 0755
+    recurse: yes
+    owner: "{{ (lookup('file', '../../../settings.json') | from_json).get('balchivist_directory_user') }}"
+    group: "{{ (lookup('file', '../../../settings.json') | from_json).get('balchivist_directory_group') }}"

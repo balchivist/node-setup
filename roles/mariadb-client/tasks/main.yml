@@ -1,0 +1,14 @@
+# This playbook installs the latest version of MariaDB client
+
+- name: Ensure that mariadb-client is at the latest version
+  become: yes # become root
+  ansible.builtin.apt:
+    name:
+      - mariadb-client
+    state: latest
+
+- name: Set up user my.cnf file to point to Trove database server
+  ansible.builtin.template:
+    src: my.cnf.j2
+    dest: ~/.my.cnf
+    mode: 0600

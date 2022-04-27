@@ -1,0 +1,9 @@
+[runners]
+dumps-1.dumps.eqiad1.wikimedia.cloud
+dumps-2.dumps.eqiad1.wikimedia.cloud
+dumps-3.dumps.eqiad1.wikimedia.cloud
+dumps-4.dumps.eqiad1.wikimedia.cloud
+dumps-5.dumps.eqiad1.wikimedia.cloud
+
+[webservers]
+dumps-10.dumps.eqiad1.wikimedia.cloud

@@ -1,0 +1,22 @@
+# Common configuration settings that will be run on all nodes
+
+# Update local cache of software packages
+- name: Update local cache of software packages
+  become: yes # become root
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+# Recompile locales
+# See: https://wikitech.wikimedia.org/wiki/Help:Locale_errors
+- name: Set the locale to be en_US.UTF-8
+  become: yes # become root
+  ansible.builtin.command: update-locale "LANG=en_US.UTF-8"
+
+- name: Generate locale for en_US.UTF-8
+  become: yes # become root
+  ansible.builtin.command: locale-gen --purge "en_US.UTF-8"
+
+- name: Reconfigure to use en_US.UTF-8 as system locale
+  become: yes # become root
+  ansible.builtin.command: dpkg-reconfigure --frontend noninteractive locales

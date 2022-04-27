@@ -1,0 +1,135 @@
+# This playbook loads a crontab used by the legacy Balchivist system
+
+- name: Set email address that cron should send to
+  ansible.builtin.cron:
+    name: MAILTO
+    env: yes
+    value: "{{ (lookup('file', '../../../settings.json') | from_json).get('legacycron_email_address') }}"
+
+# Balchivist new items
+- name: Update Balchivist for new dumps items
+  ansible.builtin.cron:
+    name: "Update Balchivist for new dumps items"
+    minute: "0"
+    hour: "5"
+    job: "python /data/project/Balchivist/runner.py --type=dumps --dumps-job=update --crontab"
+
+- name: Update Balchivist for new mediacounts items
+  ansible.builtin.cron:
+    name: "Update Balchivist for new mediacounts items"
+    minute: "0"
+    hour: "6"
+    job: "python /data/project/Balchivist/runner.py --type=mediacounts --mediacounts-job=update --crontab"
+
+- name: Update Balchivist for new wikidata items
+  ansible.builtin.cron:
+    name: "Update Balchivist for new wikidata items"
+    minute: "0"
+    hour: "7"
+    job: "python /data/project/Balchivist/runner.py --type=wikidata --wikidata-job=update --crontab"
+
+- name: Update Balchivist for new cirrussearch items
+  ansible.builtin.cron:
+    name: "Update Balchivist for new cirrussearch items"
+    minute: "0"
+    hour: "8"
+    job: "python /data/project/Balchivist/runner.py --type=cirrussearch --cirrussearch-job=update --crontab"
+
+# Balchivist check uploads
+- name: Check Balchivist dumps items have been uploaded
+  ansible.builtin.cron:
+    name: "Check Balchivist dumps items have been uploaded"
+    minute: "30"
+    hour: "5"
+    job: "python /data/project/Balchivist/runner.py --type=dumps --dumps-job=check --crontab"
+
+- name: Check Balchivist mediacounts items have been uploaded
+  ansible.builtin.cron:
+    name: "Check Balchivist mediacounts items have been uploaded"
+    minute: "30"
+    hour: "6"
+    job: "python /data/project/Balchivist/runner.py --type=mediacounts --mediacounts-job=check --crontab"
+
+- name: Check Balchivist wikidata items have been uploaded
+  ansible.builtin.cron:
+    name: "Check Balchivist wikidata items have been uploaded"
+    minute: "30"
+    hour: "7"
+    weekday: "0"
+    job: "python /data/project/Balchivist/runner.py --type=wikidata --wikidata-job=check --crontab"
+
+- name: Check Balchivist cirrussearch items have been uploaded
+  ansible.builtin.cron:
+    name: "Check Balchivist cirrussearch items have been uploaded"
+    minute: "30"
+    hour: "8"
+    weekday: "0"
+    job: "python /data/project/Balchivist/runner.py --type=cirrussearch --cirrussearch-job=check --crontab"
+
+# Incremental dumps
+- name: "Archive the first batch of incremental dumps"
+  ansible.builtin.cron:
+    name: "Archive the first batch of incremental dumps"
+    minute: "0"
+    hour: "2"
+    job: "python /data/project/incrdumps/launcher.py one"
+
+- name: "Archive the second batch of incremental dumps"
+  ansible.builtin.cron:
+    name: "Archive the second batch of incremental dumps"
+    minute: "0"
+    hour: "2"
+    job: "python /data/project/incrdumps/launcher.py two"
+
+- name: "Check the incremental dumps of the previous day have been uploaded"
+  ansible.builtin.cron:
+    name: "Check the incremental dumps of the previous day have been uploaded"
+    minute: "0"
+    hour: "3"
+    job: "python /data/project/incrdumps/checker.py"
+
+- name: "Generate the list of wikis and split into two batches"
+  ansible.builtin.cron:
+    name: "Generate the list of wikis and split into two batches"
+    minute: "0"
+    hour: "4"
+    job: "python /data/project/incrdumps/list.py"
+
+# OpenStreetMap dumps
+- name: "Archive the OpenStreetMap notes dumps"
+  ansible.builtin.cron:
+    name: "Archive the OpenStreetMap notes dumps"
+    minute: "15"
+    hour: "6"
+    job: "python /data/project/openstreetmap/notes/runner.py"
+
+- name: "Archive the OpenStreetMap wiki dumps"
+  ansible.builtin.cron:
+    name: "Archive the OpenStreetMap wiki dumps"
+    minute: "15"
+    hour: "7"
+    job: "python /data/project/openstreetmap/wiki/runner.py"
+
+- name: "Archive the OpenStreetMap planet dumps"
+  ansible.builtin.cron:
+    name: "Archive the OpenStreetMap planet dumps"
+    minute: "15"
+    hour: "9"
+    weekday: "0"
+    job: "python /data/project/openstreetmap/crontab.py planet"
+
+- name: "Archive the OpenStreetMap PBF dumps"
+  ansible.builtin.cron:
+    name: "Archive the OpenStreetMap PBF dumps"
+    minute: "15"
+    hour: "10"
+    weekday: "0"
+    job: "python /data/project/openstreetmap/crontab.py pbf"
+
+# Miscellaneous
+- name: "Archive the Wikitech wiki dumps"
+  ansible.builtin.cron:
+    name: "Archive the Wikitech wiki dumps"
+    minute: "0"
+    hour: "12"
+    job: "python /data/project/wikitech/runner.py"
