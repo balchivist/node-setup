@@ -1,0 +1,45 @@
+# This playbook sets up the environment needed for Balchivist Web and
+# API to run
+# This role requires Nginx to be installed (roles::nginx)
+
+# Reference: https://wikitech.wikimedia.org/wiki/Help:Adding_Disk_Space_to_Cloud_VPS_instances
+- name: Ensure that Cinder volume is mounted
+  ansible.builtin.command: wmcs-prepare-cinder-volume --force --device=sdb --mountpoint=/srv
+  register: command_result
+  failed_when: "'argument --device: invalid choice' in command_result.stderr"
+
+- name: Ensure that the storage directory for Balchivist Web and API is created
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    recurse: yes
+    owner: "{{ (lookup('file', '../../../settings.json') | from_json).get('balchivist_directory_user') }}"
+    group: "{{ (lookup('file', '../../../settings.json') | from_json).get('balchivist_directory_group') }}"
+  loop:
+    - "{{ balchivist_web_directory }}"
+    - "{{ balchivist_api_directory }}"
+
+- name: Add configuration file for Balchivist Web and API
+  ansible.builtin.template:
+    src: balchivist.cfg.j2
+    dest: "/etc/nginx/sites-available/balchivist-{{ balchivist_environment }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Add robots.txt file for staging site
+  when: balchivist_environment == 'staging'
+  ansible.builtin.template:
+    src: robots-staging.txt.j2
+    dest: /srv/robots-staging.txt
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable Balchivist Web and API site
+  ansible.builtin.file:
+    src: "/etc/nginx/sites-available/balchivist-{{ balchivist_environment }}"
+    dest: "/etc/nginx/sites-enabled/balchivist-{{ balchivist_environment }}"
+    state: link
+  notify: Restart nginx

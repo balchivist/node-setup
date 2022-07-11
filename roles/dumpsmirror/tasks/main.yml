@@ -1,15 +1,17 @@
 # This playbook sets up a mirror of the Wikimedia dumps server
-# This role requires Apache to be installed (roles::apache)
+# This role requires Nginx to be installed (roles::nginx)
 
 - name: Add configuration file for dumps mirror
   ansible.builtin.template:
-    src: mirror.conf.j2
-    dest: /etc/apache2/sites-available/mirror.conf
+    src: mirror.cfg.j2
+    dest: /etc/nginx/sites-available/mirror
     owner: root
     group: root
     mode: 0644
 
 - name: Enable dumps mirror site
-  ansible.builtin.command: a2ensite mirror
-  notify:
-    - Restart apache
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/mirror
+    dest: /etc/nginx/sites-enabled/mirror
+    state: link
+  notify: Restart nginx

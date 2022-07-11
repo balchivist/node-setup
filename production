@@ -7,3 +7,6 @@ dumps-5.dumps.eqiad1.wikimedia.cloud
 
 [webservers]
 dumps-10.dumps.eqiad1.wikimedia.cloud
+
+[webserversqa]
+dumps-10.dumps.eqiad1.wikimedia.cloud

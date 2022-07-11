@@ -13,7 +13,7 @@
     state: latest
 
 # Reference: https://wikitech.wikimedia.org/wiki/Help:Adding_Disk_Space_to_Cloud_VPS_instances
-- name: Mount Cinder volume
+- name: Ensure that Cinder volume is mounted
   ansible.builtin.command: wmcs-prepare-cinder-volume --force --device=sdb --mountpoint=/srv
   register: command_result
   failed_when: "'argument --device: invalid choice' in command_result.stderr"

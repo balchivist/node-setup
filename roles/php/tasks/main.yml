@@ -1,5 +1,4 @@
 # This playbook installs the latest version of PHP
-# This role requires Apache to be installed (roles::apache)
 
 - name: Ensure that php and php-mysql is at the latest version
   become: yes # become root

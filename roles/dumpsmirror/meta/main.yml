@@ -1,4 +1,4 @@
 # This file lists the dependencies required by the dumpsmirror role
 
 dependencies:
-  - role: apache
+  - role: nginx

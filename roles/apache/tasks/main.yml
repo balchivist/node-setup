@@ -1,5 +1,17 @@
 # This playbook installs the latest version of Apache
 
+- name: Ensure that nginx is not running
+  become: yes # become root
+  ansible.builtin.service:
+    name: nginx
+    state: stopped
+
+- name: Ensure nginx is not installed
+  become: yes # become root
+  ansible.builtin.apt:
+    name: nginx
+    state: absent
+
 - name: Ensure apache is at the latest version
   become: yes # become root
   ansible.builtin.apt:

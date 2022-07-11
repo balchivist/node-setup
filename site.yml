@@ -4,7 +4,6 @@
   hosts: all
   roles:
     - common
-    - apache
     - mariadb-client
     - php
 
@@ -12,13 +11,39 @@
   hosts: runners
   become: yes # become root
   roles:
+    - apache
     - balchivist
 
 - name: Configure web servers
   hosts: webservers
   become: yes # become root
   roles:
+    - nginx
     - dumpsmirror
+    # - balchivistweb
+  vars:
+    balchivist_environment: production
+    dumps_server_name: dumps.wmcloud.org
+    balchivist_web_directory: /srv/balchivist-web
+    balchivist_web_port: 3000
+    balchivist_api_directory: /srv/balchivist-api
+    balchivist_api_port: 8000
+    mirror_server_name: mirror.wmcloud.org
+    mirror_document_root: /public/dumps/public
+
+- name: Configure staging web servers
+  hosts: webserversqa
+  become: yes # become root
+  roles:
+    - nginx
+    - balchivistweb
+  vars:
+    balchivist_environment: staging
+    dumps_server_name: dumpsstaging.wmcloud.org
+    balchivist_web_directory: /srv/balchivist-web-staging
+    balchivist_web_port: 3001
+    balchivist_api_directory: /srv/balchivist-api-staging
+    balchivist_api_port: 8001
 
 - name: Configure cron for legacy Balchivist
   hosts: runners[0]

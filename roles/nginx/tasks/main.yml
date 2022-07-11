@@ -1,0 +1,48 @@
+# This playbook installs the latest version of Nginx
+
+- name: Ensure that apache is not running
+  become: yes # become root
+  ansible.builtin.service:
+    name: apache2
+    state: stopped
+
+- name: Ensure apache is not installed
+  become: yes # become root
+  ansible.builtin.apt:
+    name: apache2
+    state: absent
+
+- name: Ensure nginx is at the latest version
+  become: yes # become root
+  ansible.builtin.apt:
+    name: nginx
+    state: latest
+
+- name: Ensure php-fpm is at the latest version
+  become: yes # become root
+  ansible.builtin.apt:
+    name: php-fpm
+    state: latest
+
+- name: Update the nginx configuration file
+  become: yes # become root
+  ansible.builtin.template:
+    src: default.cfg.j2
+    dest: /etc/nginx/sites-available/default
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Restart nginx
+
+- name: Ensure that php-fpm is running
+  become: yes # become root
+  ansible.builtin.service:
+    name: php7.4-fpm
+    state: started
+
+- name: Ensure that nginx is running
+  become: yes # become root
+  ansible.builtin.service:
+    name: nginx
+    state: started
